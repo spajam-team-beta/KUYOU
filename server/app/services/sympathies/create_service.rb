@@ -4,8 +4,6 @@ module Sympathies
       new(post: post, user: user).call
     end
 
-    private
-
     def initialize(post:, user:)
       @post = post
       @user = user
@@ -27,6 +25,8 @@ module Sympathies
     rescue StandardError => e
       { success: false, error: e.message }
     end
+
+    private
 
     def already_sympathized?
       @post.sympathies.exists?(user: @user)

@@ -11,12 +11,6 @@ module Utils
     ].freeze
     
     def self.call
-      new.call
-    end
-    
-    private
-    
-    def call
       adjective = ADJECTIVES.sample
       noun = NOUNS.sample
       number = rand(1..9999).to_s.rjust(4, '0')

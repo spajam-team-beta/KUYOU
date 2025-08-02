@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct CreateReplyView: View {
     let postId: Int
@@ -8,6 +9,7 @@ struct CreateReplyView: View {
     @State private var content = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var cancellables = Set<AnyCancellable>()
     
     var canSubmit: Bool {
         !content.isEmpty && content.count <= 500 && !isLoading
@@ -135,6 +137,6 @@ struct CreateReplyView: View {
                     dismiss()
                 }
             )
-            .store(in: &Set<AnyCancellable>())
+            .store(in: &cancellables)
     }
 }

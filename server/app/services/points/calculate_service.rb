@@ -13,8 +13,6 @@ module Points
       new(user: user, action: action, amount: amount).call
     end
     
-    private
-    
     def initialize(user:, action:, amount: nil)
       @user = user
       @action = action.to_sym

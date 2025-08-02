@@ -4,8 +4,6 @@ module Posts
       new(user: user, content: content, category: category).call
     end
 
-    private
-
     def initialize(user:, content:, category:)
       @user = user
       @content = content
@@ -23,6 +21,8 @@ module Posts
     rescue StandardError => e
       { success: false, error: e.message }
     end
+
+    private
 
     def validate_content!
       result = ContentFilters::ValidateService.call(content: @content)

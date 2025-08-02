@@ -4,7 +4,7 @@ module Api
       class SessionsController < Devise::SessionsController
         respond_to :json
         
-        skip_before_action :verify_authenticity_token
+        skip_before_action :verify_authenticity_token, raise: false
         
         private
         

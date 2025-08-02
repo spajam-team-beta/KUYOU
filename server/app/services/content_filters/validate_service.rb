@@ -14,8 +14,6 @@ module ContentFilters
       new(content: content).call
     end
     
-    private
-    
     def initialize(content:)
       @content = content
     end
@@ -27,6 +25,8 @@ module ContentFilters
       
       { success: true }
     end
+    
+    private
     
     def contains_ng_words?
       NG_WORDS.any? { |word| @content.include?(word) }

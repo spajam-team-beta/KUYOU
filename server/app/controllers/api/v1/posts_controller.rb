@@ -1,7 +1,7 @@
 module Api
   module V1
     class PostsController < Api::BaseController
-      skip_before_action :authenticate_user!, only: [:index, :show]
+      skip_before_action :authenticate_request!, only: [:index, :show]
       before_action :set_post, only: [:show, :update, :destroy]
       
       def index

@@ -36,22 +36,22 @@
 - Ruby 3.2.2
 - Rails 7.0.8 (API mode)
 - MySQL 8.0
-- JWT認証 (devise-jwt)
+- JWT認証
 - Docker & Docker Compose
 
 ### iOS
 - Swift 5.8+
 - SwiftUI
-- iOS 15.0+
+- iOS 17.0+
 - URLSession + Combine
+- Xcode 15+
 
 ## 📦 セットアップ
 
 ### 前提条件
 - Docker Desktop
-- Xcode 14.0+
+- Xcode 15.0+
 - Ruby 3.2.2
-- MySQL 8.0
 
 ### Backend起動手順
 
@@ -72,6 +72,7 @@ docker-compose up -d
 # 5. データベースセットアップ
 docker-compose exec web rails db:create
 docker-compose exec web rails db:migrate
+docker-compose exec web rails db:seed
 
 # 6. 動作確認
 curl http://localhost:3000/health
@@ -99,12 +100,16 @@ Swagger UIは http://localhost:8080 でアクセス可能です。
 
 | メソッド | パス | 説明 |
 |---------|------|------|
-| POST | /api/v1/auth/register | ユーザー登録 |
+| POST | /api/v1/auth/signup | ユーザー登録 |
 | POST | /api/v1/auth/login | ログイン |
 | GET | /api/v1/posts | 投稿一覧取得 |
 | POST | /api/v1/posts | 投稿作成 |
+| GET | /api/v1/posts/:id | 投稿詳細取得 |
 | POST | /api/v1/posts/:id/sympathies | 供養追加 |
 | POST | /api/v1/posts/:id/replies | リライト案投稿 |
+| POST | /api/v1/posts/:id/replies/:reply_id/select_best | ベストアンサー選定 |
+| GET | /api/v1/profile | プロフィール取得 |
+| GET | /api/v1/ranking | ユーザーランキング |
 
 ## 🏗 アーキテクチャ
 
@@ -170,6 +175,22 @@ docker-compose exec web rubocop
 # Xcodeでテスト実行
 # Cmd + U
 ```
+
+## 🎮 テストアカウント
+
+シード実行後に利用可能：
+- Email: demo@example.com
+- Password: password123
+
+## 💰 ポイントシステム
+
+| アクション | 獲得ポイント |
+|-----------|------------|
+| 黒歴史投稿 | 10pt |
+| 供養される | 1pt |
+| リライト案投稿 | 5pt |
+| ベストアンサー選定（投稿者） | 50pt |
+| ベストアンサー獲得（回答者） | 30pt |
 
 ## 🚦 開発の流れ
 

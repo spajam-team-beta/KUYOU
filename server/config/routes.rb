@@ -3,14 +3,9 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # Auth routes
-      devise_for :users, path: 'auth', path_names: {
-        sign_in: 'login',
-        sign_out: 'logout',
-        registration: 'register'
-      }, controllers: {
-        sessions: 'api/v1/auth/sessions',
-        registrations: 'api/v1/auth/registrations'
-      }
+      post '/auth/register', to: 'auth#register'
+      post '/auth/login', to: 'auth#login'
+      delete '/auth/logout', to: 'auth#logout'
       
       # Posts routes
       resources :posts, only: [:index, :show, :create, :update, :destroy] do

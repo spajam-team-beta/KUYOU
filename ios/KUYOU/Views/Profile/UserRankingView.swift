@@ -1,9 +1,27 @@
 import SwiftUI
+import Combine
+
+struct RankingResponse: Decodable {
+    let ranking: [RankingUser]
+}
+
+struct RankingUser: Decodable {
+    let rank: Int
+    let id: Int
+    let email: String
+    let totalPoints: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case rank, id, email
+        case totalPoints = "total_points"
+    }
+}
 
 struct UserRankingView: View {
     @State private var rankings: [RankingItem] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var cancellables = Set<AnyCancellable>()
     
     struct RankingItem: Identifiable {
         let id = UUID()
@@ -113,7 +131,7 @@ struct UserRankingView: View {
         APIService.shared.request(
             path: "/users/ranking",
             method: "GET",
-            responseType: [String: [[String: Any]]].self
+            responseType: RankingResponse.self
         )
         .receive(on: DispatchQueue.main)
         .sink(
@@ -124,24 +142,16 @@ struct UserRankingView: View {
                 }
             },
             receiveValue: { response in
-                if let rankingData = response["ranking"] {
-                    rankings = rankingData.compactMap { item in
-                        guard let rank = item["rank"] as? Int,
-                              let id = item["id"] as? Int,
-                              let email = item["email"] as? String,
-                              let totalPoints = item["total_points"] as? Int else {
-                            return nil
-                        }
-                        return RankingItem(
-                            rank: rank,
-                            userId: id,
-                            email: email,
-                            totalPoints: totalPoints
-                        )
-                    }
+                rankings = response.ranking.map { user in
+                    RankingItem(
+                        rank: user.rank,
+                        userId: user.id,
+                        email: user.email,
+                        totalPoints: user.totalPoints
+                    )
                 }
             }
         )
-        .store(in: &Set<AnyCancellable>())
+        .store(in: &cancellables)
     }
 }

@@ -4,8 +4,6 @@ module Replies
       new(post: post, reply: reply).call
     end
 
-    private
-
     def initialize(post:, reply:)
       @post = post
       @reply = reply
@@ -29,6 +27,8 @@ module Replies
     rescue StandardError => e
       { success: false, error: e.message }
     end
+
+    private
 
     def resolve_post!
       @post.resolve_with_best_reply!(@reply)
