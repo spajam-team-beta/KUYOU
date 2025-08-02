@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  title: KUYOU API
+  description: 黒歴史供養プラットフォームのAPI仕様
+  version: 1.0.0
+  contact:
+    name: KUYOU Team
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: ユーザー登録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: object
+                  required:
+                    - email
+                    - password
+                    - password_confirmation
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                      minLength: 6
+                    password_confirmation:
+                      type: string
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: ログイン
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  type: object
+                  required:
+                    - email
+                    - password
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: 認証失敗
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: 投稿一覧取得
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [love, work, school, family, friend, other]
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [recent, popular]
+            default: recent
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsResponse'
+
+    post:
+      tags:
+        - Posts
+      summary: 投稿作成
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - post
+              properties:
+                post:
+                  type: object
+                  required:
+                    - content
+                    - category
+                  properties:
+                    content:
+                      type: string
+                      maxLength: 1000
+                    category:
+                      type: string
+                      enum: [love, work, school, family, friend, other]
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: 投稿詳細取得
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                    $ref: '#/components/schemas/Post'
+
+  /posts/{postId}/sympathies:
+    post:
+      tags:
+        - Sympathies
+      summary: 供養（いいね）追加
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SympathyResponse'
+
+  /posts/{postId}/replies:
+    get:
+      tags:
+        - Replies
+      summary: リライト案一覧取得
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  replies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reply'
+
+    post:
+      tags:
+        - Replies
+      summary: リライト案投稿
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reply
+              properties:
+                reply:
+                  type: object
+                  required:
+                    - content
+                  properties:
+                    content:
+                      type: string
+                      maxLength: 500
+      responses:
+        '201':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+
+  /posts/{postId}/replies/{id}/select_best:
+    patch:
+      tags:
+        - Replies
+      summary: ベストアンサー選択
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        total_points:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        nickname:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        sympathy_count:
+          type: integer
+        reply_count:
+          type: integer
+        is_resolved:
+          type: boolean
+        is_mine:
+          type: boolean
+        has_sympathized:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Reply:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        is_best:
+          type: boolean
+        user_nickname:
+          type: string
+        is_mine:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                attributes:
+                  $ref: '#/components/schemas/User'
+        token:
+          type: string
+
+    PostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            total_pages:
+              type: integer
+            total_count:
+              type: integer
+            per_page:
+              type: integer
+
+    PostResponse:
+      type: object
+      properties:
+        post:
+          $ref: '#/components/schemas/Post'
+        points_earned:
+          type: integer
+
+    SympathyResponse:
+      type: object
+      properties:
+        sympathy_count:
+          type: integer
+        points_earned:
+          type: integer
+
+    ReplyResponse:
+      type: object
+      properties:
+        reply:
+          $ref: '#/components/schemas/Reply'
+        points_earned:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string

@@ -25,7 +25,7 @@ services:
       - db
     environment:
       DATABASE_HOST: db
-      DATABASE_USERNAME: kuyou
+      DATABASE_USERNAME: root
       DATABASE_PASSWORD: password
       RAILS_ENV: development
 

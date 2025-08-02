@@ -21,8 +21,15 @@ RUN bundle install
 # Copy the rest of the application
 COPY . .
 
+# Copy and setup entrypoint script
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+
 # Clean up any cached gems
 RUN rm -rf /usr/local/bundle/cache
+
+# Setup entrypoint
+ENTRYPOINT ["entrypoint.sh"]
 
 # Expose port
 EXPOSE 3000
