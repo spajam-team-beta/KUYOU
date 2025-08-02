@@ -29,6 +29,18 @@ services:
       DATABASE_PASSWORD: password
       RAILS_ENV: development
 
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8080:8080"
+    environment:
+      SWAGGER_JSON: /api-docs/swagger.yaml
+      API_URL: http://localhost:3000/api-docs.json
+    volumes:
+      - ./swagger:/api-docs
+    depends_on:
+      - web
+
 volumes:
   mysql_data:
   bundle:
