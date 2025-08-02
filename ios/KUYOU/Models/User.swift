@@ -19,9 +19,11 @@ struct AuthResponse: Codable {
     let token: String
     
     struct UserData: Codable {
-        let data: UserAttributes
+        let data: UserResource
         
-        struct UserAttributes: Codable {
+        struct UserResource: Codable {
+            let id: String
+            let type: String
             let attributes: User
         }
     }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_2" data-name="レイヤー 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 816.88 441.33">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#_名称未設定グラデーション_269-2);
+      }
+
+      .cls-2 {
+        fill: url(#_名称未設定グラデーション_249-2);
+      }
+
+      .cls-3 {
+        fill: url(#_名称未設定グラデーション_149-2);
+      }
+
+      .cls-4 {
+        fill: url(#_名称未設定グラデーション_784);
+      }
+
+      .cls-5 {
+        fill: url(#_名称未設定グラデーション_269);
+      }
+
+      .cls-6 {
+        fill: url(#_名称未設定グラデーション_249);
+      }
+
+      .cls-7 {
+        fill: url(#_名称未設定グラデーション_149);
+      }
+
+      .cls-8 {
+        fill: #e88fb6;
+      }
+    </style>
+    <linearGradient id="_名称未設定グラデーション_149" data-name="名称未設定グラデーション 149" x1="0" y1="338.72" x2="376.28" y2="338.72" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6bc7f1"/>
+      <stop offset="0" stop-color="#f7cef7"/>
+      <stop offset=".18" stop-color="#f6c8f6"/>
+      <stop offset=".39" stop-color="#f3baf3"/>
+      <stop offset=".63" stop-color="#efa2ef"/>
+      <stop offset=".87" stop-color="#ea80ea"/>
+      <stop offset="1" stop-color="#e76ce7"/>
+    </linearGradient>
+    <linearGradient id="_名称未設定グラデーション_249" data-name="名称未設定グラデーション 249" x1="86.97" y1="263.28" x2="398.07" y2="263.28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#cfc7ff"/>
+      <stop offset="1" stop-color="#a394ff"/>
+    </linearGradient>
+    <linearGradient id="_名称未設定グラデーション_269" data-name="名称未設定グラデーション 269" x1="215.78" y1="39.16" x2="393.85" y2="347.59" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e88fb6"/>
+      <stop offset="1" stop-color="#d84183"/>
+    </linearGradient>
+    <linearGradient id="_名称未設定グラデーション_149-2" data-name="名称未設定グラデーション 149" x1="126.91" y1="338.72" x2="503.19" y2="338.72" gradientTransform="translate(943.79) rotate(-180) scale(1 -1)" xlink:href="#_名称未設定グラデーション_149"/>
+    <linearGradient id="_名称未設定グラデーション_249-2" data-name="名称未設定グラデーション 249" x1="194.18" y1="261.1" x2="505.29" y2="261.1" gradientTransform="translate(920.7) rotate(-180) scale(1 -1)" xlink:href="#_名称未設定グラデーション_249"/>
+    <linearGradient id="_名称未設定グラデーション_269-2" data-name="名称未設定グラデーション 269" x1="390.77" y1="39.16" x2="568.84" y2="347.59" gradientTransform="translate(991.36) rotate(-180) scale(1 -1)" xlink:href="#_名称未設定グラデーション_269"/>
+    <linearGradient id="_名称未設定グラデーション_784" data-name="名称未設定グラデーション 784" x1="406.79" y1="0" x2="406.79" y2="410.31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3deff"/>
+      <stop offset="1" stop-color="#e39cff"/>
+    </linearGradient>
+  </defs>
+  <g id="_レイヤー_1-2" data-name="レイヤー 1">
+    <g>
+      <path class="cls-7" d="M374.38,379.18C350.45,476.44,110.23,469.31,0,287.58c188.27-119.48,398.53-6.54,374.38,91.6Z"/>
+      <path class="cls-6" d="M372.18,388.96c-82.16,84.65-296.88-41.04-284.71-275.72,245.86-25.54,367.61,190.31,284.71,275.72Z"/>
+      <path class="cls-8" d="M456.2,347.03c102.04,36.68,227.72-151.67,122.34-339.11-212.78,76.84-225.29,302.1-122.34,339.11Z"/>
+      <path class="cls-5" d="M360.17,347.03c-102.04,36.68-227.72-151.67-122.34-339.11,212.78,76.84,225.29,302.1,122.34,339.11Z"/>
+      <path class="cls-3" d="M442.5,379.18c23.93,97.26,264.15,90.13,374.38-91.6-188.27-119.48-398.53-6.54-374.38,91.6Z"/>
+      <path class="cls-2" d="M441.31,386.79c82.16,84.65,296.88-41.04,284.71-275.72-245.86-25.54-367.61,190.31-284.71,275.72Z"/>
+      <path class="cls-1" d="M456.2,347.03c102.04,36.68,227.72-151.67,122.34-339.11-212.78,76.84-225.29,302.1-122.34,339.11Z"/>
+      <path class="cls-4" d="M409.85,410.31c133.47-.14,200.31-250.34,0-410.31-214.27,164.45-134.67,410.45,0,410.31Z"/>
+    </g>
+  </g>
+</svg>

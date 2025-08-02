@@ -1,34 +1,44 @@
 import SwiftUI
 import Combine
 
-struct RankingResponse: Decodable {
-    let ranking: [RankingUser]
-}
-
-struct RankingUser: Decodable {
-    let rank: Int
-    let id: Int
-    let email: String
-    let totalPoints: Int
-    
-    enum CodingKeys: String, CodingKey {
-        case rank, id, email
-        case totalPoints = "total_points"
-    }
-}
-
 struct UserRankingView: View {
     @State private var rankings: [RankingItem] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var cancellables = Set<AnyCancellable>()
     
-    struct RankingItem: Identifiable {
+    struct RankingItem: Identifiable, Codable {
         let id = UUID()
         let rank: Int
         let userId: Int
         let email: String
         let totalPoints: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case rank
+            case userId = "id"
+            case email
+            case totalPoints = "total_points"
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            rank = try container.decode(Int.self, forKey: .rank)
+            userId = try container.decode(Int.self, forKey: .userId)
+            email = try container.decode(String.self, forKey: .email)
+            totalPoints = try container.decode(Int.self, forKey: .totalPoints)
+        }
+        
+        init(rank: Int, userId: Int, email: String, totalPoints: Int) {
+            self.rank = rank
+            self.userId = userId
+            self.email = email
+            self.totalPoints = totalPoints
+        }
+    }
+    
+    struct RankingResponse: Codable {
+        let ranking: [RankingItem]
     }
     
     var body: some View {
@@ -142,14 +152,7 @@ struct UserRankingView: View {
                 }
             },
             receiveValue: { response in
-                rankings = response.ranking.map { user in
-                    RankingItem(
-                        rank: user.rank,
-                        userId: user.id,
-                        email: user.email,
-                        totalPoints: user.totalPoints
-                    )
-                }
+                rankings = response.ranking
             }
         )
         .store(in: &cancellables)

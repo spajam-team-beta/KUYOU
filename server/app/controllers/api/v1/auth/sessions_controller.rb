@@ -5,14 +5,45 @@ module Api
         respond_to :json
         
         skip_before_action :verify_authenticity_token, raise: false
+
+        def create
+          Rails.logger.info "Raw params: #{params.inspect}"
+          Rails.logger.info "User params: #{user_params.inspect}"
+          
+          # Extract email and password from nested user params
+          if params[:user].present?
+            request.params[:email] = params[:user][:email]
+            request.params[:password] = params[:user][:password]
+          end
+          
+          super
+        end
         
         private
         
+        def user_params
+          params.require(:user).permit(:email, :password)
+        end
+        
         def respond_with(resource, _opts = {})
-          render json: {
-            user: UserSerializer.new(resource).serializable_hash,
-            token: request.env['warden-jwt_auth.token']
-          }, status: :ok
+          Rails.logger.info "SessionsController#respond_with called"
+          Rails.logger.info "Resource: #{resource.inspect}"
+          Rails.logger.info "Resource persisted: #{resource.persisted?}"
+          Rails.logger.info "Resource errors: #{resource.errors.full_messages}"
+          
+          if resource.persisted?
+            token = request.env['warden-jwt_auth.token']
+            Rails.logger.info "JWT Token: #{token}"
+            
+            render json: {
+              user: UserSerializer.new(resource).serializable_hash,
+              token: token
+            }, status: :ok
+          else
+            render json: {
+              error: 'メールアドレスまたはパスワードが正しくありません'
+            }, status: :unauthorized
+          end
         end
         
         def respond_to_on_destroy

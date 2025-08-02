@@ -3,9 +3,15 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # Auth routes
-      post '/auth/register', to: 'auth#register'
-      post '/auth/login', to: 'auth#login'
-      delete '/auth/logout', to: 'auth#logout'
+      devise_for :users, path: 'auth', path_names: {
+        sign_in: 'login',
+        sign_out: 'logout',
+        registration: 'register'
+      }, controllers: {
+        sessions: 'api/v1/auth/sessions',
+        registrations: 'api/v1/auth/registrations',
+        passwords: 'api/v1/auth/passwords'
+      }
       
       # Posts routes
       resources :posts, only: [:index, :show, :create, :update, :destroy] do
@@ -29,9 +35,15 @@ Rails.application.routes.draw do
       
       # Profile routes
       resource :profile, only: [:show, :update]
+      
+      # Test routes (development only)
+      post 'test/send_email', to: 'test#send_test_email' if Rails.env.development?
     end
   end
   
   # Health check
   get '/health', to: proc { [200, {}, ['OK']] }
+  
+  # Letter opener web (development only)
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 end

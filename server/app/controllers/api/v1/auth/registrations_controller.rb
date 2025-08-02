@@ -11,10 +11,10 @@ module Api
           build_resource(sign_up_params)
           
           if resource.save
-            sign_up(resource_name, resource)
+            token = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil).first
             render json: {
               user: UserSerializer.new(resource).serializable_hash,
-              token: request.env['warden-jwt_auth.token']
+              token: token
             }, status: :created
           else
             render json: {

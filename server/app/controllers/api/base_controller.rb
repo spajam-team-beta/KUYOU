@@ -1,6 +1,5 @@
 module Api
   class BaseController < ApplicationController
-    # skip_before_action :verify_authenticity_token # Not needed in API mode
     before_action :authenticate_request!
     
     rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
