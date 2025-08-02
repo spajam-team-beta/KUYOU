@@ -37,6 +37,11 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
 
   config.action_mailer.perform_caching = false
+  
+  # Letter opener configuration
+  config.action_mailer.delivery_method = :letter_opener_web
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -62,4 +67,7 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+  
+  # Secret key for development
+  config.secret_key_base = 'c735511b128f95fac7e94d97e3f210310b9c41c4a3aa18f1f6a453f1fded1df28d9543d71f14fbdfcbe42141d70267f8f8f401b2377375df24098de68834e2c1'
 end

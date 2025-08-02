@@ -41,3 +41,15 @@ struct ReplyResponse: Codable {
         case pointsEarned = "points_earned"
     }
 }
+
+struct BestReplyResponse: Codable {
+    let success: Bool
+    let message: String?
+    let pointsEarned: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case success
+        case message
+        case pointsEarned = "points_earned"
+    }
+}

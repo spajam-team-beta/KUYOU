@@ -1,16 +1,44 @@
 import SwiftUI
+import Combine
 
 struct UserRankingView: View {
     @State private var rankings: [RankingItem] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var cancellables = Set<AnyCancellable>()
     
-    struct RankingItem: Identifiable {
+    struct RankingItem: Identifiable, Codable {
         let id = UUID()
         let rank: Int
         let userId: Int
         let email: String
         let totalPoints: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case rank
+            case userId = "id"
+            case email
+            case totalPoints = "total_points"
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            rank = try container.decode(Int.self, forKey: .rank)
+            userId = try container.decode(Int.self, forKey: .userId)
+            email = try container.decode(String.self, forKey: .email)
+            totalPoints = try container.decode(Int.self, forKey: .totalPoints)
+        }
+        
+        init(rank: Int, userId: Int, email: String, totalPoints: Int) {
+            self.rank = rank
+            self.userId = userId
+            self.email = email
+            self.totalPoints = totalPoints
+        }
+    }
+    
+    struct RankingResponse: Codable {
+        let ranking: [RankingItem]
     }
     
     var body: some View {
@@ -113,7 +141,7 @@ struct UserRankingView: View {
         APIService.shared.request(
             path: "/users/ranking",
             method: "GET",
-            responseType: [String: [[String: Any]]].self
+            responseType: RankingResponse.self
         )
         .receive(on: DispatchQueue.main)
         .sink(
@@ -124,24 +152,9 @@ struct UserRankingView: View {
                 }
             },
             receiveValue: { response in
-                if let rankingData = response["ranking"] {
-                    rankings = rankingData.compactMap { item in
-                        guard let rank = item["rank"] as? Int,
-                              let id = item["id"] as? Int,
-                              let email = item["email"] as? String,
-                              let totalPoints = item["total_points"] as? Int else {
-                            return nil
-                        }
-                        return RankingItem(
-                            rank: rank,
-                            userId: id,
-                            email: email,
-                            totalPoints: totalPoints
-                        )
-                    }
-                }
+                rankings = response.ranking
             }
         )
-        .store(in: &Set<AnyCancellable>())
+        .store(in: &cancellables)
     }
 }

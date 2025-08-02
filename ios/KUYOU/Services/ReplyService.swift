@@ -31,11 +31,11 @@ class ReplyService {
         )
     }
     
-    func selectBestReply(postId: Int, replyId: Int) -> AnyPublisher<[String: Any], APIError> {
+    func selectBestReply(postId: Int, replyId: Int) -> AnyPublisher<BestReplyResponse, APIError> {
         return APIService.shared.request(
             path: "/posts/\(postId)/replies/\(replyId)/select_best",
             method: "PATCH",
-            responseType: [String: Any].self
+            responseType: BestReplyResponse.self
         )
     }
 }

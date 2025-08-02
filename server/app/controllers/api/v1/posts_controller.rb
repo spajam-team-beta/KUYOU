@@ -19,14 +19,14 @@ module Api
         posts = posts.page(params[:page]).per(params[:per_page] || 10)
         
         render json: {
-          posts: posts.map { |post| PostSerializer.new(post).serializable_hash[:data][:attributes] },
+          posts: posts.map { |post| PostSerializer.new(post, { params: { current_user: current_user } }).serializable_hash[:data][:attributes] },
           meta: pagination_meta(posts)
         }
       end
       
       def show
         render json: {
-          post: PostSerializer.new(@post).serializable_hash[:data][:attributes]
+          post: PostSerializer.new(@post, { params: { current_user: current_user } }).serializable_hash[:data][:attributes]
         }
       end
       
@@ -39,7 +39,7 @@ module Api
         
         if result[:success]
           render json: {
-            post: PostSerializer.new(result[:post]).serializable_hash[:data][:attributes],
+            post: PostSerializer.new(result[:post], { params: { current_user: current_user } }).serializable_hash[:data][:attributes],
             points_earned: result[:points_earned]
           }, status: :created
         else
@@ -52,7 +52,7 @@ module Api
         
         if @post.update(post_params)
           render json: {
-            post: PostSerializer.new(@post).serializable_hash[:data][:attributes]
+            post: PostSerializer.new(@post, { params: { current_user: current_user } }).serializable_hash[:data][:attributes]
           }
         else
           render json: { error: @post.errors.full_messages }, status: :unprocessable_entity
