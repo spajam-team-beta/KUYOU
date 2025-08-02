@@ -33,6 +33,7 @@ struct ProfileResponse: Codable {
 class ProfileViewModel: ObservableObject {
     @Published var currentUser: User?
     @Published var userStats: UserStats?
+    @Published var myPosts: [Post] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -63,6 +64,27 @@ class ProfileViewModel: ObservableObject {
             receiveValue: { [weak self] response in
                 self?.currentUser = response.profile.user
                 self?.userStats = response.profile.stats
+                self?.loadMyPosts()
+            }
+        )
+        .store(in: &cancellables)
+    }
+    
+    func loadMyPosts() {
+        APIService.shared.request(
+            path: "/posts?filter=mine",
+            method: "GET",
+            responseType: PostsResponse.self
+        )
+        .receive(on: DispatchQueue.main)
+        .sink(
+            receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Failed to load my posts: \(error)")
+                }
+            },
+            receiveValue: { [weak self] response in
+                self?.myPosts = response.posts
             }
         )
         .store(in: &cancellables)

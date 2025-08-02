@@ -4,6 +4,10 @@ struct PostDetailView: View {
     let postId: Int
     @StateObject private var viewModel = PostDetailViewModel()
     @State private var showingReplySheet = false
+    @State private var showAscensionEffect = false
+    @State private var isPressed = false
+    @State private var showGlow = false
+    @State private var particleEmit = false
     
     var body: some View {
         ScrollView {
@@ -56,18 +60,55 @@ struct PostDetailView: View {
                         
                         // Actions
                         HStack(spacing: 30) {
-                            // Sympathy button
-                            Button(action: {
-                                viewModel.toggleSympathy()
-                            }) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: post.hasSympathized ?? false ? "hands.clap.fill" : "hands.clap")
-                                    Text("\(post.sympathyCount) 供養")
-                                        .font(.caption)
+                            // Sympathy button with animation
+                            ZStack {
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                        isPressed = true
+                                        showGlow = true
+                                        particleEmit = true
+                                    }
+                                    
+                                    AudioService.shared.playMokugyo()
+                                    viewModel.toggleSympathy()
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        isPressed = false
+                                    }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                        showGlow = false
+                                    }
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "hands.sparkles.fill")
+                                            .font(.body)
+                                        Text("\(post.sympathyCount)")
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                    }
+                                    .foregroundColor(.purple)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.purple.opacity(0.1))
+                                    )
                                 }
-                                .foregroundColor(post.hasSympathized ?? false ? .purple : .gray)
+                                .mokugyoTap(isPressed: $isPressed)
+                                .salvationGlow(trigger: $showGlow)
+                                .disabled(!AuthService.shared.isAuthenticated)
+                                .overlay(
+                                    GeometryReader { geometry in
+                                        ParticleEmitterView(emit: $particleEmit)
+                                            .position(
+                                                x: geometry.size.width / 2,
+                                                y: geometry.size.height / 2
+                                            )
+                                            .allowsHitTesting(false)
+                                    }
+                                )
                             }
-                            .disabled(!AuthService.shared.isAuthenticated)
                             
                             // Reply button
                             if !post.isResolved {
@@ -112,6 +153,13 @@ struct PostDetailView: View {
                                     isPostOwner: post.isMine ?? false,
                                     onSelectBest: {
                                         viewModel.selectBestReply(reply)
+                                        if !post.isResolved {
+                                            showAscensionEffect = true
+                                            AudioService.shared.playAscension()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                                showAscensionEffect = false
+                                            }
+                                        }
                                     }
                                 )
                             }
@@ -138,6 +186,41 @@ struct PostDetailView: View {
         .onAppear {
             viewModel.postId = postId
             viewModel.loadPost()
+        }
+        .overlay(
+            ascensionOverlay
+        )
+    }
+    
+    @ViewBuilder
+    private var ascensionOverlay: some View {
+        if showAscensionEffect {
+            ZStack {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 30) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 100))
+                        .foregroundColor(.yellow)
+                        .rotationEffect(.degrees(showAscensionEffect ? 360 : 0))
+                        .animation(.linear(duration: 2), value: showAscensionEffect)
+                    
+                    Text("成仏")
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("黒歴史が浄化されました")
+                        .font(.headline)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .scaleEffect(showAscensionEffect ? 1 : 0)
+                .opacity(showAscensionEffect ? 1 : 0)
+                .animation(.spring(response: 0.6), value: showAscensionEffect)
+            }
+            .onTapGesture {
+                showAscensionEffect = false
+            }
         }
     }
     

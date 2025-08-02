@@ -22,6 +22,9 @@ module Server
     
     # Autoload paths for services
     config.autoload_paths << Rails.root.join("app/services")
+    
+    # Autoload paths for lib
+    config.autoload_paths << Rails.root.join("lib")
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.

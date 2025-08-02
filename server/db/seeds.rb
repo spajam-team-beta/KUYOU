@@ -88,7 +88,7 @@ posts = []
 post_contents.each do |post_data|
   post = Post.create!(
     user: post_data[:user],
-    nickname: Utils::NicknameGenerator.call,
+    nickname: Generators::NicknameGenerator.call,
     content: post_data[:content],
     category: post_data[:category],
     status: ["active", "resolved"].sample

@@ -3,22 +3,20 @@ import SwiftUI
 struct CreatePostView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = CreatePostViewModel()
+    @State private var showSuccessAnimation = false
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
                 // Header
                 VStack(spacing: 8) {
-                    Image(systemName: "pencil.and.outline")
-                        .font(.system(size: 50))
+                    Image(systemName: "hands.sparkles.fill")
+                        .font(.system(size: 48))
                         .foregroundColor(.purple)
                     
-                    Text("懺悔の間")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text("あなたの黒歴史を匿名で投稿しましょう")
-                        .font(.caption)
+                    Text("あなたの黒歴史を供養します")
+                        .font(.headline)
                         .foregroundColor(.secondary)
                 }
                 .padding(.top)
@@ -59,12 +57,15 @@ struct CreatePostView: View {
                         }
                         
                         TextEditor(text: $viewModel.content)
+                            .focused($isTextFieldFocused)
                             .padding(8)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color(.systemGray4), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
                             )
-                            .frame(minHeight: 200)
+                            .frame(minHeight: 150)
                             .overlay(
                                 Group {
                                     if viewModel.content.isEmpty {
@@ -114,19 +115,51 @@ struct CreatePostView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
+                        isTextFieldFocused = false
                         viewModel.createPost {
-                            dismiss()
+                            showSuccessAnimation = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                dismiss()
+                            }
                         }
                     }) {
                         if viewModel.isLoading {
                             ProgressView()
                         } else {
-                            Text("投稿")
+                            Text("供養に出す")
                                 .fontWeight(.semibold)
                         }
                     }
                     .disabled(!viewModel.canPost)
                 }
+            }
+            .overlay(successOverlay)
+        }
+    }
+    
+    @ViewBuilder
+    private var successOverlay: some View {
+        if showSuccessAnimation {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 80))
+                        .foregroundColor(.green)
+                    
+                    Text("供養完了")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    Text("+10 徳ポイント")
+                        .font(.headline)
+                        .foregroundColor(.yellow)
+                }
+                .scaleEffect(showSuccessAnimation ? 1 : 0)
+                .animation(.spring(), value: showSuccessAnimation)
             }
         }
     }
@@ -137,20 +170,35 @@ struct CategoryButton: View {
     let isSelected: Bool
     let action: () -> Void
     
+    var categoryIcon: String {
+        switch category {
+        case .love: return "heart.fill"
+        case .work: return "briefcase.fill"
+        case .school: return "graduationcap.fill"
+        case .family: return "house.fill"
+        case .friend: return "person.2.fill"
+        case .other: return "questionmark.circle.fill"
+        }
+    }
+    
     var body: some View {
         Button(action: action) {
-            Text(category.displayName)
-                .font(.caption)
-                .fontWeight(isSelected ? .semibold : .regular)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    isSelected ? Color.purple : Color(.systemGray5)
-                )
-                .foregroundColor(
-                    isSelected ? .white : .primary
-                )
-                .cornerRadius(20)
+            HStack(spacing: 4) {
+                Image(systemName: categoryIcon)
+                    .font(.caption)
+                Text(category.displayName)
+                    .font(.caption)
+                    .fontWeight(isSelected ? .semibold : .regular)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                isSelected ? Color.purple : Color(.systemGray5)
+            )
+            .foregroundColor(
+                isSelected ? .white : .primary
+            )
+            .cornerRadius(20)
         }
     }
 }

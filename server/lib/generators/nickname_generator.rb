@@ -1,4 +1,4 @@
-module Utils
+module Generators
   class NicknameGenerator
     ADJECTIVES = %w[
       迷える 悩める 恥ずかしがりの 反省中の 後悔の

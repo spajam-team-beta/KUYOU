@@ -22,7 +22,7 @@ class AuthService: ObservableObject {
     }
     
     private func loadStoredCredentials() {
-        if let token = keychain.get(tokenKey),
+        if keychain.get(tokenKey) != nil,
            let userData = UserDefaults.standard.data(forKey: userKey),
            let user = try? JSONDecoder().decode(User.self, from: userData) {
             self.currentUser = user

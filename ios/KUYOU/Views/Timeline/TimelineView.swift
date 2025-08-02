@@ -111,6 +111,17 @@ struct TimelineView: View {
             }
         }
     }
+    
+    private func categoryIcon(for category: PostCategory) -> String {
+        switch category {
+        case .love: return "heart.fill"
+        case .work: return "briefcase.fill"
+        case .school: return "graduationcap.fill"
+        case .family: return "house.fill"
+        case .friend: return "person.2.fill"
+        case .other: return "questionmark.circle.fill"
+        }
+    }
 }
 
 struct FilterChip: View {
