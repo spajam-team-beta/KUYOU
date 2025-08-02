@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Logs
+log/*
+tmp/*
+
+# OS files
+.DS_Store
+
+# Development
+.env
+.env.*
+
+# Test
+coverage/*
+spec/tmp/*
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Bundler
+.bundle
+vendor/bundle
+
+# Node
+node_modules/
+
+# Rails
+public/assets
+public/packs
+public/packs-test
+
+# Database
+*.sqlite3
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key
