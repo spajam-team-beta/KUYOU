@@ -39,7 +39,7 @@ module Posts
     end
 
     def generate_nickname
-      Utils::NicknameGenerator.call
+      Generators::NicknameGenerator.call
     end
 
     def calculate_points
