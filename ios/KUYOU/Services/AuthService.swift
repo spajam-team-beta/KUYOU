@@ -69,7 +69,7 @@ class AuthService: ObservableObject {
             )
         )
         
-        print("🔍 RegisterRequest created: \(registerRequest)")
+        print("🔍 RegisterRequest created for email: \(email)")
         
         guard let body = try? APIService.shared.encode(registerRequest) else {
             print("❌ Failed to encode RegisterRequest")
