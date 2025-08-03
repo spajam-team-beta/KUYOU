@@ -209,7 +209,3 @@ MIT License
 - Backend開発
 - iOS開発
 - UI/UXデザイン
-
-## 📞 お問い合わせ
-
-issues: https://github.com/[username]/KUYOU/issues
