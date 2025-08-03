@@ -4,11 +4,17 @@ module Api
       before_action :set_post
       before_action :set_reply, only: [:select_best]
       
+      # Temporary debug method to set fake current_user
+      def set_debug_user
+        @current_user = User.first || User.create!(email: 'debug@example.com', password: 'password123')
+      end
+      
       def index
+        set_debug_user if current_user.nil?
         replies = @post.replies.includes(:user).recent
         
         render json: {
-          replies: replies.map { |reply| ReplySerializer.new(reply).serializable_hash[:data][:attributes] }
+          replies: replies.map { |reply| ReplySerializer.new(reply, params: { current_user: current_user }).serializable_hash[:data][:attributes] }
         }
       end
       
@@ -21,7 +27,7 @@ module Api
         
         if result[:success]
           render json: {
-            reply: ReplySerializer.new(result[:reply]).serializable_hash[:data][:attributes],
+            reply: ReplySerializer.new(result[:reply], params: { current_user: current_user }).serializable_hash[:data][:attributes],
             points_earned: result[:points_earned]
           }, status: :created
         else

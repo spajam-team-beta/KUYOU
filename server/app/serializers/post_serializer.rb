@@ -13,7 +13,9 @@ class PostSerializer
   end
   
   attribute :is_mine do |post, params|
-    params[:current_user] && post.user_id == params[:current_user].id
+    result = params[:current_user] && post.user_id == params[:current_user].id
+    Rails.logger.info "🔍 PostSerializer DEBUG: current_user=#{params[:current_user]&.id}, post.user_id=#{post.user_id}, is_mine=#{result}"
+    result
   end
   
   attribute :has_sympathized do |post, params|

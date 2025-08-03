@@ -107,7 +107,14 @@ struct TimelineView: View {
             .onAppear {
                 if viewModel.posts.isEmpty {
                     viewModel.loadPosts()
+                } else {
+                    // Check for updates when view appears
+                    viewModel.checkForUpdates()
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                // Check for updates when app enters foreground
+                viewModel.checkForUpdates()
             }
         }
     }

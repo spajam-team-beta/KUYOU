@@ -4,10 +4,11 @@ struct PostDetailView: View {
     let postId: Int
     @StateObject private var viewModel = PostDetailViewModel()
     @State private var showingReplySheet = false
-    @State private var showAscensionEffect = false
+ 
     @State private var isPressed = false
     @State private var showGlow = false
     @State private var particleEmit = false
+    @State private var animateAscension = false
     
     var body: some View {
         ScrollView {
@@ -154,10 +155,10 @@ struct PostDetailView: View {
                                     onSelectBest: {
                                         viewModel.selectBestReply(reply)
                                         if !post.isResolved {
-                                            showAscensionEffect = true
+                                            viewModel.showAscensionEffect = true
                                             AudioService.shared.playAscension()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                                showAscensionEffect = false
+                                                viewModel.showAscensionEffect = false
                                             }
                                         }
                                     }
@@ -194,36 +195,91 @@ struct PostDetailView: View {
     
     @ViewBuilder
     private var ascensionOverlay: some View {
-        if showAscensionEffect {
-            ZStack {
-                Color.black.opacity(0.6)
-                    .ignoresSafeArea()
-                
-                VStack(spacing: 30) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 100))
-                        .foregroundColor(.yellow)
-                        .rotationEffect(.degrees(showAscensionEffect ? 360 : 0))
-                        .animation(.linear(duration: 2), value: showAscensionEffect)
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+                .opacity(viewModel.showAscensionEffect ? 1 : 0)
+            
+            ForEach(0..<8, id: \.self) { index in
+                Image(systemName: "sparkles")
+                    .font(.system(size: 30 + CGFloat(index * 10)))
+                    .foregroundColor(.yellow.opacity(0.8))
+                    .offset(
+                        x: cos(Double(index) * .pi / 4) * 100,
+                        y: sin(Double(index) * .pi / 4) * 100
+                    )
+                    .rotationEffect(.degrees(animateAscension ? 360 * Double(index + 1) : 0))
+                    .scaleEffect(animateAscension ? 1.5 : 0.5)
+                    .opacity(animateAscension ? 0.8 : 0)
+                    .animation(.easeInOut(duration: 2).delay(Double(index) * 0.1), value: animateAscension)
+            }
+            
+            VStack(spacing: 40) {
+                ZStack {
+                    Circle()
+                        .fill(Color.orange.opacity(0.3))
+                        .frame(width: 150, height: 150)
+                        .scaleEffect(animateAscension ? 2 : 0)
+                        .opacity(animateAscension ? 0 : 1)
+                        .animation(.easeOut(duration: 1.5), value: animateAscension)
                     
-                    Text("成仏")
+                    Image(systemName: "sparkles.tv.fill")
+                        .font(.system(size: 80))
+                        .foregroundColor(.yellow)
+                        .rotationEffect(.degrees(animateAscension ? 720 : 0))
+                        .scaleEffect(animateAscension ? 1.2 : 0.3)
+                        .animation(.spring(response: 0.8, dampingFraction: 0.6), value: animateAscension)
+                }
+                
+                VStack(spacing: 16) {
+                    Text("🙏 成仏 🙏")
                         .font(.system(size: 48, weight: .bold))
                         .foregroundColor(.white)
+                        .shadow(color: .orange, radius: 10)
+                        .scaleEffect(animateAscension ? 1 : 0.5)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.3), value: animateAscension)
                     
                     Text("黒歴史が浄化されました")
+                        .font(.title2)
+                        .foregroundColor(.white.opacity(0.9))
+                        .multilineTextAlignment(.center)
+                        .opacity(animateAscension ? 1 : 0)
+                        .offset(y: animateAscension ? 0 : 30)
+                        .animation(.easeOut(duration: 0.8).delay(0.8), value: animateAscension)
+                    
+                    Text("+80 徳ポイント")
                         .font(.headline)
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.2))
+                        .cornerRadius(20)
+                        .opacity(animateAscension ? 1 : 0)
+                        .offset(y: animateAscension ? 0 : 30)
+                        .animation(.easeOut(duration: 0.8).delay(1.2), value: animateAscension)
                 }
-                .scaleEffect(showAscensionEffect ? 1 : 0)
-                .opacity(showAscensionEffect ? 1 : 0)
-                .animation(.spring(response: 0.6), value: showAscensionEffect)
             }
-            .onTapGesture {
-                showAscensionEffect = false
+        }
+        .allowsHitTesting(viewModel.showAscensionEffect)
+        .opacity(viewModel.showAscensionEffect ? 1 : 0)
+        .animation(.easeInOut, value: viewModel.showAscensionEffect)
+        .onTapGesture {
+            animateAscension = false
+            viewModel.showAscensionEffect = false
+        }
+        .onChange(of: viewModel.showAscensionEffect) { newValue in
+            if newValue {
+                animateAscension = false
+                DispatchQueue.main.async {
+                    animateAscension = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    animateAscension = false
+                    viewModel.showAscensionEffect = false
+                }
             }
         }
     }
-    
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
@@ -232,3 +288,4 @@ struct PostDetailView: View {
         return formatter.string(from: date)
     }
 }
+

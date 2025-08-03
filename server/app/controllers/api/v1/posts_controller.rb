@@ -1,13 +1,19 @@
 module Api
   module V1
     class PostsController < Api::BaseController
-      skip_before_action :authenticate_request!, only: [:index, :show]
+      skip_before_action :authenticate_request!, only: [:index]
+      
+      # Temporary debug method to set fake current_user
+      def set_debug_user
+        @current_user = User.first || User.create!(email: 'debug@example.com', password: 'password123')
+      end
       before_action :set_post, only: [:show, :update, :destroy]
       
       def index
         posts = Post.active_posts
                    .includes(:user)
                    .by_category(params[:category])
+                   .by_keyword(params[:keyword])
                    
         posts = case params[:sort]
                 when 'popular'
@@ -19,14 +25,15 @@ module Api
         posts = posts.page(params[:page]).per(params[:per_page] || 10)
         
         render json: {
-          posts: posts.map { |post| PostSerializer.new(post).serializable_hash[:data][:attributes] },
+          posts: posts.map { |post| PostSerializer.new(post, params: { current_user: current_user }).serializable_hash[:data][:attributes] },
           meta: pagination_meta(posts)
         }
       end
       
       def show
+        set_debug_user if current_user.nil?
         render json: {
-          post: PostSerializer.new(@post).serializable_hash[:data][:attributes]
+          post: PostSerializer.new(@post, params: { current_user: current_user }).serializable_hash[:data][:attributes]
         }
       end
       
@@ -39,7 +46,7 @@ module Api
         
         if result[:success]
           render json: {
-            post: PostSerializer.new(result[:post]).serializable_hash[:data][:attributes],
+            post: PostSerializer.new(result[:post], params: { current_user: current_user }).serializable_hash[:data][:attributes],
             points_earned: result[:points_earned]
           }, status: :created
         else
@@ -52,7 +59,7 @@ module Api
         
         if @post.update(post_params)
           render json: {
-            post: PostSerializer.new(@post).serializable_hash[:data][:attributes]
+            post: PostSerializer.new(@post, params: { current_user: current_user }).serializable_hash[:data][:attributes]
           }
         else
           render json: { error: @post.errors.full_messages }, status: :unprocessable_entity

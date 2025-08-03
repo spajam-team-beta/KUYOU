@@ -19,7 +19,7 @@ class PostService {
         return APIService.shared.request(
             path: path,
             method: "GET",
-            authenticated: false,
+            authenticated: true,
             responseType: PostsResponse.self
         )
     }
@@ -28,7 +28,7 @@ class PostService {
         return APIService.shared.request(
             path: "/posts/\(id)",
             method: "GET",
-            authenticated: false,
+            authenticated: true,
             responseType: [String: Post].self
         )
         .compactMap { $0["post"] }

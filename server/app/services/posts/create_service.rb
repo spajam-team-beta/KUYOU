@@ -30,12 +30,15 @@ module Posts
     end
 
     def create_post_with_nickname
-      Post.create!(
+      Rails.logger.info "🔍 Creating post with user_id: #{@user&.id}"
+      post = Post.create!(
         user: @user,
         content: @content,
         category: @category,
         nickname: generate_nickname
       )
+      Rails.logger.info "🔍 Created post with id: #{post.id}, user_id: #{post.user_id}"
+      post
     end
 
     def generate_nickname

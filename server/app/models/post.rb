@@ -17,6 +17,7 @@ class Post < ApplicationRecord
   scope :active_posts, -> { where(status: 'active') }
   scope :resolved_posts, -> { where(status: 'resolved') }
   scope :by_category, ->(category) { where(category: category) if category.present? }
+  scope :by_keyword, ->(keyword) { where('content LIKE ?', "%#{keyword}%") if keyword.present? }
   scope :popular, -> { order(sympathy_count: :desc) }
   scope :recent, -> { order(created_at: :desc) }
   
