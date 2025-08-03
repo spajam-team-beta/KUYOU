@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @StateObject private var viewModel = TimelineViewModel()
+    @ObservedObject var viewModel: TimelineViewModel
     @State private var showingCreatePost = false
+    
+    init(viewModel: TimelineViewModel = TimelineViewModel()) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         NavigationView {
@@ -50,11 +54,24 @@ struct TimelineView: View {
                 } else if viewModel.posts.isEmpty {
                     Spacer()
                     VStack(spacing: 16) {
-                        Image(systemName: "doc.text.magnifyingglass")
+                        Image(systemName: viewModel.isSearching ? "magnifyingglass" : "doc.text.magnifyingglass")
                             .font(.system(size: 60))
                             .foregroundColor(.gray)
-                        Text("投稿がありません")
-                            .foregroundColor(.secondary)
+                        
+                        if viewModel.isSearching {
+                            Text("「\(viewModel.searchText)」の検索結果はありません")
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("検索をクリア") {
+                                viewModel.clearSearch()
+                            }
+                            .foregroundColor(.purple)
+                            .padding(.top, 8)
+                        } else {
+                            Text("投稿がありません")
+                                .foregroundColor(.secondary)
+                        }
                     }
                     Spacer()
                 } else {

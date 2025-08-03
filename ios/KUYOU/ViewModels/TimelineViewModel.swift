@@ -8,6 +8,8 @@ class TimelineViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var selectedCategory: PostCategory?
     @Published var selectedSort: SortOption = .recent
+    @Published var searchText = ""
+    @Published var isSearching = false
     
     private var currentPage = 1
     private var totalPages = 1
@@ -17,6 +19,7 @@ class TimelineViewModel: ObservableObject {
     
     init() {
         setupNotificationObservers()
+        setupSearchObserver()
     }
     
     private func setupNotificationObservers() {
@@ -48,6 +51,22 @@ class TimelineViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    private func setupSearchObserver() {
+        // Debounce search text changes
+        $searchText
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] searchText in
+                self?.performSearch(keyword: searchText)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func performSearch(keyword: String) {
+        isSearching = !keyword.isEmpty
+        loadPosts(refresh: true)
+    }
+    
     enum SortOption: String, CaseIterable {
         case recent = "recent"
         case popular = "popular"
@@ -74,7 +93,8 @@ class TimelineViewModel: ObservableObject {
         postService.fetchPosts(
             page: currentPage,
             category: selectedCategory?.rawValue,
-            sort: selectedSort.rawValue
+            sort: selectedSort.rawValue,
+            keyword: searchText.isEmpty ? nil : searchText
         )
         .receive(on: DispatchQueue.main)
         .sink(
@@ -154,6 +174,10 @@ class TimelineViewModel: ObservableObject {
         loadPosts(refresh: true)
     }
     
+    func clearSearch() {
+        searchText = ""
+    }
+    
     // Auto-refresh when posts change
     func refreshFromBackground() {
         loadPosts(refresh: true)
@@ -164,7 +188,8 @@ class TimelineViewModel: ObservableObject {
         postService.fetchPosts(
             page: 1,
             category: selectedCategory?.rawValue,
-            sort: selectedSort.rawValue
+            sort: selectedSort.rawValue,
+            keyword: searchText.isEmpty ? nil : searchText
         )
         .receive(on: DispatchQueue.main)
         .sink(

@@ -9,11 +9,16 @@ class PostService {
         page: Int = 1,
         perPage: Int = 10,
         category: String? = nil,
-        sort: String = "recent"
+        sort: String = "recent",
+        keyword: String? = nil
     ) -> AnyPublisher<PostsResponse, APIError> {
         var path = "/posts?page=\(page)&per_page=\(perPage)&sort=\(sort)"
         if let category = category {
             path += "&category=\(category)"
+        }
+        if let keyword = keyword, !keyword.isEmpty {
+            let encodedKeyword = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? keyword
+            path += "&keyword=\(encodedKeyword)"
         }
         
         return APIService.shared.request(
