@@ -45,6 +45,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func loadProfile() {
+        print("🔄 ProfileViewModel: プロフィール読み込み開始")
         isLoading = true
         errorMessage = nil
         
@@ -62,8 +63,13 @@ class ProfileViewModel: ObservableObject {
                 }
             },
             receiveValue: { [weak self] response in
+                print("📨 ProfileViewModel: プロフィールデータ受信")
+                print("📝 受信したユーザー: \(response.profile.user.displayNickname)")
                 self?.currentUser = response.profile.user
                 self?.userStats = response.profile.stats
+                // AuthServiceも更新
+                self?.authService.updateCurrentUser(response.profile.user)
+                print("✅ ProfileViewModel: プロフィール更新完了")
                 self?.loadMyPosts()
             }
         )
@@ -104,5 +110,28 @@ class ProfileViewModel: ObservableObject {
                 }
             )
             .store(in: &cancellables)
+    }
+    
+    func updateUserNickname(_ nickname: String) {
+        print("🔄 ProfileViewModel: ニックネーム更新開始 '\(nickname)'")
+        if let user = currentUser {
+            print("📝 現在のユーザー: \(user.displayNickname)")
+            // Update local user object immediately
+            let updatedUser = User(
+                id: user.id,
+                email: user.email,
+                nickname: nickname.isEmpty ? nil : nickname,
+                totalPoints: user.totalPoints,
+                createdAt: user.createdAt
+            )
+            print("📝 更新後のユーザー: \(updatedUser.displayNickname)")
+            self.currentUser = updatedUser
+            
+            // Update auth service
+            authService.updateCurrentUser(updatedUser)
+            print("✅ ProfileViewModel: ローカル更新完了")
+        } else {
+            print("❌ ProfileViewModel: currentUserがnil")
+        }
     }
 }

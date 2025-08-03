@@ -5,6 +5,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var selectedTab = 0
     @State private var showLevelUpAnimation = false
+    @State private var showingEditNickname = false
     
     var body: some View {
         NavigationView {
@@ -64,6 +65,16 @@ struct ProfileView: View {
             .onAppear {
                 viewModel.loadProfile()
             }
+            .sheet(isPresented: $showingEditNickname) {
+                EditNicknameView(
+                    currentNickname: viewModel.currentUser?.nickname
+                ) { newNickname in
+                    print("🔄 ProfileView: ニックネーム保存コールバック '\(newNickname)'")
+                    viewModel.updateUserNickname(newNickname)
+                    // プロフィール再読み込みを一時的に停止
+                    // viewModel.loadProfile() 
+                }
+            }
             .overlay(levelUpOverlay)
         }
     }
@@ -81,9 +92,19 @@ struct ProfileView: View {
                         .animation(.easeOut(duration: 1).repeatForever(autoreverses: false), value: showLevelUpAnimation)
                 )
             
-            Text("匿名の供養師")
-                .font(.title2)
-                .fontWeight(.bold)
+            HStack {
+                Text(viewModel.currentUser?.displayNickname ?? "匿名の供養師")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Button(action: {
+                    showingEditNickname = true
+                }) {
+                    Image(systemName: "pencil")
+                        .font(.caption)
+                        .foregroundColor(.purple)
+                }
+            }
             
             if let user = viewModel.currentUser {
                 HStack(spacing: 20) {

@@ -11,11 +11,17 @@ module Api
       end
       
       def update
+        Rails.logger.info "🔄 Profile update params: #{profile_params}"
+        Rails.logger.info "📝 Current user before update: #{current_user.attributes}"
+        
         if current_user.update(profile_params)
+          Rails.logger.info "✅ Profile update successful"
+          Rails.logger.info "📝 Current user after update: #{current_user.attributes}"
           render json: {
             user: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
           }
         else
+          Rails.logger.info "❌ Profile update failed: #{current_user.errors.full_messages}"
           render json: { error: current_user.errors.full_messages }, status: :unprocessable_entity
         end
       end
@@ -23,7 +29,7 @@ module Api
       private
       
       def profile_params
-        params.require(:user).permit(:email)
+        params.require(:user).permit(:email, :nickname)
       end
       
       def user_stats

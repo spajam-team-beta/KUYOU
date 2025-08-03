@@ -13,9 +13,14 @@ class User < ApplicationRecord
   # Validations
   validates :email, presence: true, uniqueness: true
   validates :total_points, numericality: { greater_than_or_equal_to: 0 }
+  validates :nickname, length: { maximum: 30 }, uniqueness: { allow_blank: true }
   
   # Methods
   def add_points(amount)
     increment!(:total_points, amount)
+  end
+  
+  def display_nickname
+    nickname.present? ? nickname : "智者##{id.to_s.rjust(4, '0')}"
   end
 end
