@@ -64,6 +64,8 @@ class ProfileViewModel: ObservableObject {
             receiveValue: { [weak self] response in
                 self?.currentUser = response.profile.user
                 self?.userStats = response.profile.stats
+                // AuthServiceも更新
+                self?.authService.updateCurrentUser(response.profile.user)
                 self?.loadMyPosts()
             }
         )
@@ -104,5 +106,22 @@ class ProfileViewModel: ObservableObject {
                 }
             )
             .store(in: &cancellables)
+    }
+    
+    func updateUserNickname(_ nickname: String) {
+        if let user = currentUser {
+            // Update local user object immediately
+            let updatedUser = User(
+                id: user.id,
+                email: user.email,
+                nickname: nickname.isEmpty ? nil : nickname,
+                totalPoints: user.totalPoints,
+                createdAt: user.createdAt
+            )
+            self.currentUser = updatedUser
+            
+            // Update auth service
+            authService.updateCurrentUser(updatedUser)
+        }
     }
 }

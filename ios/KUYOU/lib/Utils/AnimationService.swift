@@ -24,13 +24,13 @@ struct SalvationGlowModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .overlay(
-                Circle()
-                    .stroke(Color.yellow.opacity(0.6), lineWidth: 2)
-                    .scaleEffect(1 + glowAmount)
-                    .opacity(1 - glowAmount)
-                    .animation(AnimationConstants.salvationGlow, value: glowAmount)
-            )
+//            .overlay(
+//                Circle()
+//                    .stroke(Color.yellow.opacity(0.6), lineWidth: 2)
+//                    .scaleEffect(1 + glowAmount)
+//                    .opacity(1 - glowAmount)
+//                    .animation(AnimationConstants.salvationGlow, value: glowAmount)
+//            )
             .onChange(of: triggerGlow) { _, newValue in
                 if newValue {
                     glowAmount = 0.5

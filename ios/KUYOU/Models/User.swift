@@ -3,12 +3,18 @@ import Foundation
 struct User: Codable, Identifiable {
     let id: Int
     let email: String
+    let nickname: String?
     let totalPoints: Int
     let createdAt: Date
+    
+    var displayNickname: String {
+        return nickname?.isEmpty == false ? nickname! : "智者#\(String(format: "%04d", id))"
+    }
     
     enum CodingKeys: String, CodingKey {
         case id
         case email
+        case nickname
         case totalPoints = "total_points"
         case createdAt = "created_at"
     }

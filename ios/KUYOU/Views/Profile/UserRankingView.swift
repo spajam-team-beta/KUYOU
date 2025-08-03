@@ -8,11 +8,12 @@ struct RankingResponse: Decodable {
 struct RankingUser: Decodable {
     let rank: Int
     let id: Int
+    let nickname: String
     let email: String
     let totalPoints: Int
     
     enum CodingKeys: String, CodingKey {
-        case rank, id, email
+        case rank, id, nickname, email
         case totalPoints = "total_points"
     }
 }
@@ -27,6 +28,7 @@ struct UserRankingView: View {
         let id = UUID()
         let rank: Int
         let userId: Int
+        let nickname: String
         let email: String
         let totalPoints: Int
     }
@@ -60,7 +62,7 @@ struct UserRankingView: View {
                         
                         // User info
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(item.email)
+                            Text(item.nickname)
                                 .font(.headline)
                             
                             HStack(spacing: 4) {
@@ -131,6 +133,7 @@ struct UserRankingView: View {
         APIService.shared.request(
             path: "/users/ranking",
             method: "GET",
+            authenticated: true,
             responseType: RankingResponse.self
         )
         .receive(on: DispatchQueue.main)
@@ -146,6 +149,7 @@ struct UserRankingView: View {
                     RankingItem(
                         rank: user.rank,
                         userId: user.id,
+                        nickname: user.nickname,
                         email: user.email,
                         totalPoints: user.totalPoints
                     )

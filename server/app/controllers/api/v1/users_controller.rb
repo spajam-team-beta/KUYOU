@@ -18,6 +18,7 @@ module Api
             {
               rank: index + 1,
               id: user.id,
+              nickname: user.display_nickname,
               email: mask_email(user.email),
               total_points: user.total_points
             }

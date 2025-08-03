@@ -23,7 +23,7 @@ module Api
       private
       
       def profile_params
-        params.require(:user).permit(:email)
+        params.require(:user).permit(:email, :nickname)
       end
       
       def user_stats

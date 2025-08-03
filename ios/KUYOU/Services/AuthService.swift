@@ -119,4 +119,11 @@ class AuthService: ObservableObject {
         UserDefaults.standard.removeObject(forKey: userKey)
     }
     
+    func updateCurrentUser(_ user: User) {
+        currentUser = user
+        // ユーザー情報をUserDefaultsに保存
+        if let userData = try? JSONEncoder().encode(user) {
+            UserDefaults.standard.set(userData, forKey: userKey)
+        }
+    }
 }
