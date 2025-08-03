@@ -8,7 +8,6 @@ module Api
         if user.save
           token = generate_jwt_token(user)
           user_data = UserSerializer.new(user).serializable_hash
-          Rails.logger.info "🔍 UserSerializer output: #{user_data}"
           
           response_data = {
             user: {
