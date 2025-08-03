@@ -152,10 +152,6 @@ struct PostCard: View {
             .foregroundColor(.purple)
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(
-                Circle()
-                    .fill(Color.purple.opacity(0.1))
-            )
         }
         .mokugyoTap(isPressed: $isPressed)
         .salvationGlow(trigger: $showGlow)
