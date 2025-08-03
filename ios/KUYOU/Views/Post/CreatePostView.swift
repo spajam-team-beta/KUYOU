@@ -23,24 +23,6 @@ struct CreatePostView: View {
                 
                 // Form
                 VStack(alignment: .leading, spacing: 16) {
-                    // Category selection
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("カテゴリ")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 10) {
-                                ForEach(PostCategory.allCases, id: \.self) { category in
-                                    CategoryButton(
-                                        category: category,
-                                        isSelected: viewModel.selectedCategory == category,
-                                        action: { viewModel.selectedCategory = category }
-                                    )
-                                }
-                            }
-                        }
-                    }
                     
                     // Content input
                     VStack(alignment: .leading, spacing: 8) {
@@ -87,6 +69,23 @@ struct CreatePostView: View {
                             .foregroundColor(.red)
                     }
                     
+                    // Category selection
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("カテゴリ")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12) {
+                            ForEach(PostCategory.allCases, id: \.self) { category in
+                                CategoryChip(
+                                    category: category,
+                                    isSelected: viewModel.selectedCategory == category,
+                                    action: { viewModel.selectedCategory = category }
+                                )
+                            }
+                        }
+                    }
+                    
                     // Notice
                     VStack(alignment: .leading, spacing: 4) {
                         Label("投稿時の注意", systemImage: "exclamationmark.triangle")
@@ -97,6 +96,7 @@ struct CreatePostView: View {
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
+                    .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.orange.opacity(0.1))
                     .cornerRadius(8)
@@ -117,9 +117,11 @@ struct CreatePostView: View {
                     Button(action: {
                         isTextFieldFocused = false
                         viewModel.createPost {
+                            viewModel.content = ""
                             showSuccessAnimation = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                dismiss()
+                                showSuccessAnimation = false
+                                
                             }
                         }
                     }) {
@@ -170,21 +172,10 @@ struct CategoryButton: View {
     let isSelected: Bool
     let action: () -> Void
     
-    var categoryIcon: String {
-        switch category {
-        case .love: return "heart.fill"
-        case .work: return "briefcase.fill"
-        case .school: return "graduationcap.fill"
-        case .family: return "house.fill"
-        case .friend: return "person.2.fill"
-        case .other: return "questionmark.circle.fill"
-        }
-    }
-    
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
-                Image(systemName: categoryIcon)
+                Image(systemName: category.icon)
                     .font(.caption)
                 Text(category.displayName)
                     .font(.caption)
@@ -198,6 +189,28 @@ struct CategoryButton: View {
             .foregroundColor(
                 isSelected ? .white : .primary
             )
+            .cornerRadius(20)
+        }
+    }
+}
+
+struct CategoryChip: View {
+    let category: PostCategory
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: category.icon)
+                    .font(.caption)
+                Text(category.displayName)
+                    .font(.caption)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color.purple : Color(.systemGray5))
+            .foregroundColor(isSelected ? .white : .primary)
             .cornerRadius(20)
         }
     }
