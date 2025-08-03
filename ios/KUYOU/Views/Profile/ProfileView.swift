@@ -69,10 +69,8 @@ struct ProfileView: View {
                 EditNicknameView(
                     currentNickname: viewModel.currentUser?.nickname
                 ) { newNickname in
-                    print("🔄 ProfileView: ニックネーム保存コールバック '\(newNickname)'")
                     viewModel.updateUserNickname(newNickname)
-                    // プロフィール再読み込みを一時的に停止
-                    // viewModel.loadProfile() 
+                    viewModel.loadProfile() // プロフィール情報を再読み込み
                 }
             }
             .overlay(levelUpOverlay)

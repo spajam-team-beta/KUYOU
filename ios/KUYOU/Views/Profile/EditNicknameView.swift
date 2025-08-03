@@ -107,19 +107,14 @@ class EditNicknameViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        print("🔄 ニックネーム更新開始: '\(nickname)'")
-        
         let request = UpdateNicknameRequest(user: UpdateNicknameRequest.UserData(nickname: nickname))
         
         guard let body = try? APIService.shared.encode(request) else {
-            print("❌ リクエストエンコード失敗")
             errorMessage = "リクエストの作成に失敗しました"
             isLoading = false
             completion(false)
             return
         }
-        
-        print("📤 APIリクエスト送信中...")
         
         APIService.shared.request(
             path: "/profile",
@@ -133,16 +128,11 @@ class EditNicknameViewModel: ObservableObject {
             receiveCompletion: { [weak self] result in
                 self?.isLoading = false
                 if case .failure(let error) = result {
-                    print("❌ API呼び出し失敗: \(error)")
                     self?.errorMessage = error.localizedDescription
                     completion(false)
-                } else {
-                    print("✅ API呼び出し完了")
                 }
             },
             receiveValue: { response in
-                print("📨 レスポンス受信: \(response)")
-                print("💾 ニックネーム更新成功!")
                 completion(true)
             }
         )
