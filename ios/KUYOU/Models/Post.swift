@@ -28,6 +28,25 @@ struct Post: Codable, Identifiable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(Int.self, forKey: .id)
+        nickname = try container.decode(String.self, forKey: .nickname)
+        content = try container.decode(String.self, forKey: .content)
+        category = try container.decode(String.self, forKey: .category)
+        status = try container.decode(String.self, forKey: .status)
+        sympathyCount = try container.decode(Int.self, forKey: .sympathyCount)
+        replyCount = try container.decode(Int.self, forKey: .replyCount)
+        isResolved = try container.decode(Bool.self, forKey: .isResolved)
+        isMine = try container.decodeIfPresent(Bool.self, forKey: .isMine)
+        hasSympathized = try container.decodeIfPresent(Bool.self, forKey: .hasSympathized)
+        
+        // カスタム日付デコード
+        createdAt = try DateUtils.decodeDate(from: container, forKey: .createdAt)
+        updatedAt = try DateUtils.decodeDate(from: container, forKey: .updatedAt)
+    }
 }
 
 struct PostsResponse: Codable {
