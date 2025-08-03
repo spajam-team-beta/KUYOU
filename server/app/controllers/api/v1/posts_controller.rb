@@ -3,10 +3,6 @@ module Api
     class PostsController < Api::BaseController
       skip_before_action :authenticate_request!, only: [:index]
       
-      # Temporary debug method to set fake current_user
-      def set_debug_user
-        @current_user = User.first || User.create!(email: 'debug@example.com', password: 'password123')
-      end
       before_action :set_post, only: [:show, :update, :destroy]
       
       def index
@@ -31,7 +27,6 @@ module Api
       end
       
       def show
-        set_debug_user if current_user.nil?
         render json: {
           post: PostSerializer.new(@post, params: { current_user: current_user }).serializable_hash[:data][:attributes]
         }
