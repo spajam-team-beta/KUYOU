@@ -92,7 +92,6 @@ class AuthService: ObservableObject {
             receiveOutput: { response in
                 print("🔍 AuthService register response: \(response)")
                 print("🔍 User data: \(response.user)")
-                print("🔍 Token: \(response.token)")
             },
             receiveCompletion: { completion in
                 if case .failure(let error) = completion {
