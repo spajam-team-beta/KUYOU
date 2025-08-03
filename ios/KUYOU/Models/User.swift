@@ -3,7 +3,7 @@ import Foundation
 struct User: Codable, Identifiable {
     var id: Int
     var email: String
-   var nickname: String?
+    var nickname: String?
     var totalPoints: Int
     var createdAt: Date
     
