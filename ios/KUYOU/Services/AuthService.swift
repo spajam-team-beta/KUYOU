@@ -119,27 +119,4 @@ class AuthService: ObservableObject {
         UserDefaults.standard.removeObject(forKey: userKey)
     }
     
-    // Debug method for testing - creates/logs in a demo user
-    func loginAsDemoUser() {
-        register(email: "demo@example.com", password: "password123", passwordConfirmation: "password123")
-            .sink(
-                receiveCompletion: { completion in
-                    if case .failure(_) = completion {
-                        // If registration fails, try login
-                        self.login(email: "demo@example.com", password: "password123")
-                            .sink(
-                                receiveCompletion: { _ in },
-                                receiveValue: { user in
-                                    print("🔍 Demo user logged in: \(user.id)")
-                                }
-                            )
-                            .store(in: &self.cancellables)
-                    }
-                },
-                receiveValue: { user in
-                    print("🔍 Demo user registered and logged in: \(user.id)")
-                }
-            )
-            .store(in: &cancellables)
-    }
 }

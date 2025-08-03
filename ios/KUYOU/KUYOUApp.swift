@@ -12,12 +12,6 @@ struct KUYOUApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    // Auto-login for testing
-                    if !AuthService.shared.isAuthenticated {
-                        AuthService.shared.loginAsDemoUser()
-                    }
-                }
         }
     }
 }
