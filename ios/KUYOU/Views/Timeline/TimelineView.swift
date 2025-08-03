@@ -28,18 +28,6 @@ struct TimelineView: View {
                                 action: { viewModel.changeCategory(category) }
                             )
                         }
-                        
-                        Divider()
-                            .frame(height: 20)
-                        
-                        // Sort options
-                        ForEach(TimelineViewModel.SortOption.allCases, id: \.self) { sort in
-                            FilterChip(
-                                title: sort.displayName,
-                                isSelected: viewModel.selectedSort == sort,
-                                action: { viewModel.changeSort(sort) }
-                            )
-                        }
                     }
                     .padding(.horizontal)
                 }
@@ -110,11 +98,31 @@ struct TimelineView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingCreatePost = true
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.purple)
+                    HStack(spacing: 12) {
+                        Menu {
+                            ForEach(TimelineViewModel.SortOption.allCases, id: \.self) { sort in
+                                Button(action: {
+                                    viewModel.changeSort(sort)
+                                }) {
+                                    HStack {
+                                        Text(sort.displayName)
+                                        if viewModel.selectedSort == sort {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .foregroundColor(.purple)
+                        }
+                        
+                        Button(action: {
+                            showingCreatePost = true
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.purple)
+                        }
                     }
                 }
             }
