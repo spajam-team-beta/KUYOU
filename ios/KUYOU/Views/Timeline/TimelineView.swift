@@ -2,7 +2,6 @@ import SwiftUI
 
 struct TimelineView: View {
     @ObservedObject var viewModel: TimelineViewModel
-    @State private var showingCreatePost = false
     
     init(viewModel: TimelineViewModel = TimelineViewModel()) {
         self.viewModel = viewModel
@@ -12,24 +11,19 @@ struct TimelineView: View {
         NavigationView {
             VStack(spacing: 0) {
                 // Filter bar
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        // Category filters
-                        FilterChip(
-                            title: "すべて",
-                            isSelected: viewModel.selectedCategory == nil,
-                            action: { viewModel.changeCategory(nil) }
-                        )
-                        
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("カテゴリを選択", systemImage: "folder.circle.fill")
+                        .font(.headline)
+                    
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12) {
                         ForEach(PostCategory.allCases, id: \.self) { category in
-                            FilterChip(
-                                title: category.displayName,
+                            CategoryChip(
+                                category: category,
                                 isSelected: viewModel.selectedCategory == category,
-                                action: { viewModel.changeCategory(category) }
+                                action: { viewModel.selectedCategory = category }
                             )
                         }
                     }
-                    .padding(.horizontal)
                 }
                 .padding(.vertical, 8)
                 .background(Color(.systemGray6))
@@ -116,18 +110,8 @@ struct TimelineView: View {
                             Image(systemName: "arrow.up.arrow.down")
                                 .foregroundColor(.purple)
                         }
-                        
-                        Button(action: {
-                            showingCreatePost = true
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.purple)
-                        }
                     }
                 }
-            }
-            .sheet(isPresented: $showingCreatePost) {
-                CreatePostView()
             }
             .onAppear {
                 if viewModel.posts.isEmpty {

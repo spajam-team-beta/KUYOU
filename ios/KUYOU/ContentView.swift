@@ -28,6 +28,10 @@ struct MainTabView: View {
                 TimelineView(viewModel: timelineViewModel)
             }
             
+            Tab("懺悔の間", systemImage: "plus.circle.fill") {
+               CreatePostView()
+            }
+            
             Tab("プロフィール", systemImage: "person.circle") {
                 ProfileView()
             }

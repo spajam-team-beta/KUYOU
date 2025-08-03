@@ -52,12 +52,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_03_021118) do
     t.integer "total_points", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
     t.string "nickname", limit: 30
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["nickname"], name: "index_users_on_nickname"
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "posts", "users"
