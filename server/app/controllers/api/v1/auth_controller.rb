@@ -18,7 +18,6 @@ module Api
             },
             token: token
           }
-          Rails.logger.info "🔍 Final response: #{response_data}"
           
           render json: response_data, status: :created
         else
