@@ -118,4 +118,5 @@ class AuthService: ObservableObject {
         keychain.delete(tokenKey)
         UserDefaults.standard.removeObject(forKey: userKey)
     }
+    
 }

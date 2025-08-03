@@ -20,23 +20,27 @@ struct ContentView: View {
 }
 
 struct MainTabView: View {
-    @State private var selectedTab = 0
+    @StateObject private var timelineViewModel = TimelineViewModel()
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            TimelineView()
-                .tabItem {
-                    Label("供養の広場", systemImage: "hands.sparkles")
-                }
-                .tag(0)
+        TabView {
+            Tab("供養の広場", systemImage: "hands.sparkles") {
+                TimelineView(viewModel: timelineViewModel)
+            }
             
-            ProfileView()
-                .tabItem {
-                    Label("プロフィール", systemImage: "person.circle")
-                }
-                .tag(1)
+            Tab("プロフィール", systemImage: "person.circle") {
+                ProfileView()
+            }
+            
+            Tab(role: .search) {
+                TimelineView(viewModel: timelineViewModel)
+            }
         }
         .accentColor(.purple)
+        .searchable(
+            text: $timelineViewModel.searchText,
+            prompt: "黒歴史を検索..."
+        )
     }
 }
 

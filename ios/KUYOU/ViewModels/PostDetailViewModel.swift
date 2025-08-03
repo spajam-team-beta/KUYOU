@@ -6,6 +6,7 @@ class PostDetailViewModel: ObservableObject {
     @Published var replies: [Reply] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var showAscensionEffect: Bool = false
     
     var postId: Int = 0
     private var cancellables = Set<AnyCancellable>()

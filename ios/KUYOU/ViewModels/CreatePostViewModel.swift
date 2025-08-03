@@ -35,6 +35,10 @@ class CreatePostViewModel: ObservableObject {
             receiveValue: { response in
                 // Show success message if needed
                 print("Post created successfully! Points earned: \(response.pointsEarned ?? 0)")
+                
+                // Notify timeline to refresh
+                NotificationService.shared.postCreated()
+                
                 completion()
             }
         )

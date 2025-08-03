@@ -133,6 +133,9 @@ struct CreateReplyView: View {
                     }
                 },
                 receiveValue: { _ in
+                    // Notify timeline to refresh
+                    NotificationService.shared.replyCreated(postId: postId)
+                    
                     onSuccess()
                     dismiss()
                 }

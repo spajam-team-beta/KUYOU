@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @StateObject private var viewModel = TimelineViewModel()
+    @ObservedObject var viewModel: TimelineViewModel
     @State private var showingCreatePost = false
+    
+    init(viewModel: TimelineViewModel = TimelineViewModel()) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         NavigationView {
@@ -24,18 +28,6 @@ struct TimelineView: View {
                                 action: { viewModel.changeCategory(category) }
                             )
                         }
-                        
-                        Divider()
-                            .frame(height: 20)
-                        
-                        // Sort options
-                        ForEach(TimelineViewModel.SortOption.allCases, id: \.self) { sort in
-                            FilterChip(
-                                title: sort.displayName,
-                                isSelected: viewModel.selectedSort == sort,
-                                action: { viewModel.changeSort(sort) }
-                            )
-                        }
                     }
                     .padding(.horizontal)
                 }
@@ -50,11 +42,24 @@ struct TimelineView: View {
                 } else if viewModel.posts.isEmpty {
                     Spacer()
                     VStack(spacing: 16) {
-                        Image(systemName: "doc.text.magnifyingglass")
+                        Image(systemName: viewModel.isSearching ? "magnifyingglass" : "doc.text.magnifyingglass")
                             .font(.system(size: 60))
                             .foregroundColor(.gray)
-                        Text("投稿がありません")
-                            .foregroundColor(.secondary)
+                        
+                        if viewModel.isSearching {
+                            Text("「\(viewModel.searchText)」の検索結果はありません")
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("検索をクリア") {
+                                viewModel.clearSearch()
+                            }
+                            .foregroundColor(.purple)
+                            .padding(.top, 8)
+                        } else {
+                            Text("投稿がありません")
+                                .foregroundColor(.secondary)
+                        }
                     }
                     Spacer()
                 } else {
@@ -93,11 +98,31 @@ struct TimelineView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingCreatePost = true
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.purple)
+                    HStack(spacing: 12) {
+                        Menu {
+                            ForEach(TimelineViewModel.SortOption.allCases, id: \.self) { sort in
+                                Button(action: {
+                                    viewModel.changeSort(sort)
+                                }) {
+                                    HStack {
+                                        Text(sort.displayName)
+                                        if viewModel.selectedSort == sort {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .foregroundColor(.purple)
+                        }
+                        
+                        Button(action: {
+                            showingCreatePost = true
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.purple)
+                        }
                     }
                 }
             }
@@ -107,7 +132,14 @@ struct TimelineView: View {
             .onAppear {
                 if viewModel.posts.isEmpty {
                     viewModel.loadPosts()
+                } else {
+                    // Check for updates when view appears
+                    viewModel.checkForUpdates()
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                // Check for updates when app enters foreground
+                viewModel.checkForUpdates()
             }
         }
     }

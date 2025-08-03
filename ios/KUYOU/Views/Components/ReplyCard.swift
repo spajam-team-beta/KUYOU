@@ -63,7 +63,7 @@ struct ReplyCard: View {
                     .cornerRadius(20)
                 }
             }
-            
+
             // Mine indicator
             if reply.isMine ?? false {
                 Text("自分のリライト案")

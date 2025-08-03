@@ -8,11 +8,64 @@ class TimelineViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var selectedCategory: PostCategory?
     @Published var selectedSort: SortOption = .recent
+    @Published var searchText = ""
+    @Published var isSearching = false
     
     private var currentPage = 1
     private var totalPages = 1
     private var cancellables = Set<AnyCancellable>()
     private let postService = PostService.shared
+    private var autoRefreshTimer: Timer?
+    
+    init() {
+        setupNotificationObservers()
+        setupSearchObserver()
+    }
+    
+    private func setupNotificationObservers() {
+        // Listen for post creation
+        NotificationCenter.default.publisher(for: .postCreated)
+            .sink { [weak self] _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self?.checkForUpdates()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Listen for reply creation
+        NotificationCenter.default.publisher(for: .replyCreated)
+            .sink { [weak self] _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self?.checkForUpdates()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Listen for sympathy updates
+        NotificationCenter.default.publisher(for: .sympathyUpdated)
+            .sink { [weak self] notification in
+                if let postId = notification.userInfo?["postId"] as? Int {
+                    self?.refreshPostData(postId: postId)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func setupSearchObserver() {
+        // Debounce search text changes
+        $searchText
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] searchText in
+                self?.performSearch(keyword: searchText)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func performSearch(keyword: String) {
+        isSearching = !keyword.isEmpty
+        loadPosts(refresh: true)
+    }
     
     enum SortOption: String, CaseIterable {
         case recent = "recent"
@@ -40,7 +93,8 @@ class TimelineViewModel: ObservableObject {
         postService.fetchPosts(
             page: currentPage,
             category: selectedCategory?.rawValue,
-            sort: selectedSort.rawValue
+            sort: selectedSort.rawValue,
+            keyword: searchText.isEmpty ? nil : searchText
         )
         .receive(on: DispatchQueue.main)
         .sink(
@@ -96,6 +150,9 @@ class TimelineViewModel: ObservableObject {
                         updatedPost.hasSympathized = !hasAlreadySympathized
                         return updatedPost
                     }
+                    
+                    // Notify other parts of the app about the sympathy update
+                    NotificationService.shared.sympathyUpdated(postId: post.id)
                 }
             )
             .store(in: &cancellables)
@@ -115,5 +172,49 @@ class TimelineViewModel: ObservableObject {
     func changeSort(_ sort: SortOption) {
         selectedSort = sort
         loadPosts(refresh: true)
+    }
+    
+    func clearSearch() {
+        searchText = ""
+    }
+    
+    // Auto-refresh when posts change
+    func refreshFromBackground() {
+        loadPosts(refresh: true)
+    }
+    
+    // Check for new posts without showing loading indicator
+    func checkForUpdates() {
+        postService.fetchPosts(
+            page: 1,
+            category: selectedCategory?.rawValue,
+            sort: selectedSort.rawValue,
+            keyword: searchText.isEmpty ? nil : searchText
+        )
+        .receive(on: DispatchQueue.main)
+        .sink(
+            receiveCompletion: { _ in },
+            receiveValue: { [weak self] response in
+                guard let self = self else { return }
+                let newPosts = response.posts
+                
+                // Check if we have new posts
+                if !newPosts.isEmpty && (self.posts.isEmpty || newPosts.first?.id != self.posts.first?.id) {
+                    // Insert new posts at the beginning
+                    let uniqueNewPosts = newPosts.filter { newPost in
+                        !self.posts.contains { $0.id == newPost.id }
+                    }
+                    self.posts = uniqueNewPosts + self.posts
+                }
+            }
+        )
+        .store(in: &cancellables)
+    }
+    
+    // Refresh specific post data
+    private func refreshPostData(postId: Int) {
+        // Just check for updates to refresh the entire list
+        // This ensures we get the latest data for all posts
+        checkForUpdates()
     }
 }

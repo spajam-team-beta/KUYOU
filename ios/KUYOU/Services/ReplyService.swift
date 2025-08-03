@@ -13,6 +13,7 @@ class ReplyService {
         return APIService.shared.request(
             path: "/posts/\(postId)/replies",
             method: "GET",
+            authenticated: true,
             responseType: RepliesResponse.self
         )
     }
