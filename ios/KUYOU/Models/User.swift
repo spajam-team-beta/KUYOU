@@ -1,11 +1,11 @@
 import Foundation
 
 struct User: Codable, Identifiable {
-    let id: Int
-    let email: String
-    let nickname: String?
-    let totalPoints: Int
-    let createdAt: Date
+    var id: Int
+    var email: String
+    var nickname: String?
+    var totalPoints: Int
+    var createdAt: Date
     
     var displayNickname: String {
         return nickname?.isEmpty == false ? nickname! : "智者#\(String(format: "%04d", id))"
@@ -17,6 +17,18 @@ struct User: Codable, Identifiable {
         case nickname
         case totalPoints = "total_points"
         case createdAt = "created_at"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(Int.self, forKey: .id)
+        email = try container.decode(String.self, forKey: .email)
+        nickname = try container.decodeIfPresent(String.self, forKey: .nickname)
+        totalPoints = try container.decode(Int.self, forKey: .totalPoints)
+        
+        // カスタム日付デコード
+        createdAt = try DateUtils.decodeDate(from: container, forKey: .createdAt)
     }
 }
 

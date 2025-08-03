@@ -7,10 +7,18 @@ module Api
         
         if user.save
           token = generate_jwt_token(user)
-          render json: {
-            user: UserSerializer.new(user).serializable_hash,
+          user_data = UserSerializer.new(user).serializable_hash
+          
+          response_data = {
+            user: {
+              data: {
+                attributes: user_data[:data][:attributes]
+              }
+            },
             token: token
-          }, status: :created
+          }
+          
+          render json: response_data, status: :created
         else
           render json: {
             error: user.errors.full_messages
@@ -25,7 +33,11 @@ module Api
         if user&.valid_password?(params.dig(:user, :password))
           token = generate_jwt_token(user)
           render json: {
-            user: UserSerializer.new(user).serializable_hash,
+            user: {
+              data: {
+                attributes: UserSerializer.new(user).serializable_hash[:data][:attributes]
+              }
+            },
             token: token
           }, status: :ok
         else

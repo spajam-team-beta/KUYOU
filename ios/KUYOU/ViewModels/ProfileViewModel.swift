@@ -111,13 +111,8 @@ class ProfileViewModel: ObservableObject {
     func updateUserNickname(_ nickname: String) {
         if let user = currentUser {
             // Update local user object immediately
-            let updatedUser = User(
-                id: user.id,
-                email: user.email,
-                nickname: nickname.isEmpty ? nil : nickname,
-                totalPoints: user.totalPoints,
-                createdAt: user.createdAt
-            )
+            var updatedUser = user
+            updatedUser.nickname = nickname.isEmpty ? nil : nickname
             self.currentUser = updatedUser
             
             // Update auth service
