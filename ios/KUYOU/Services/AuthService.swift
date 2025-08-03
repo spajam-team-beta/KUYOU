@@ -59,7 +59,6 @@ class AuthService: ObservableObject {
     }
     
     func register(email: String, password: String, passwordConfirmation: String) -> AnyPublisher<User, APIError> {
-        print("🔍 AuthService register called with email: \(maskEmail(email))")
         
         let registerRequest = RegisterRequest(
             user: RegisterRequest.RegisterData(
@@ -69,17 +68,13 @@ class AuthService: ObservableObject {
             )
         )
         
-        print("🔍 RegisterRequest created for email: \(email)")
+        
         
         guard let body = try? APIService.shared.encode(registerRequest) else {
-            print("❌ Failed to encode RegisterRequest")
             return Fail(error: APIError.decodingError)
                 .eraseToAnyPublisher()
         }
         
-        print("🔍 Request body encoded successfully")
-        
-        print("🔍 About to call APIService.request for /auth/register")
         
         return APIService.shared.request(
             path: "/auth/register",
@@ -100,9 +95,8 @@ class AuthService: ObservableObject {
             }
         )
         .map { [weak self] response in
-            print("🔍 Extracting user attributes...")
             let user = response.user.data.attributes
-            print("🔍 Extracted user: \(user)")
+            
             self?.saveCredentials(user: user, token: response.token)
             return user
         }
