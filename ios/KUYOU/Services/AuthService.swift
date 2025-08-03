@@ -59,7 +59,7 @@ class AuthService: ObservableObject {
     }
     
     func register(email: String, password: String, passwordConfirmation: String) -> AnyPublisher<User, APIError> {
-        print("🔍 AuthService register called with email: \(email)")
+        print("🔍 AuthService register called with email: \(maskEmail(email))")
         
         let registerRequest = RegisterRequest(
             user: RegisterRequest.RegisterData(
